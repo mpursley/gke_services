@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: localhost/app-repo/python-app
   pullPolicy: Never
-  tag: "latest"
+  tag: "0.3.0"
 
 service:
   type: ClusterIP
