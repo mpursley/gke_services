@@ -1,9 +1,9 @@
 replicaCount: 1
 
 image:
-  repository: app-repo/python-app
-  pullPolicy: IfNotPresent
-  tag: "latest"
+  repository: localhost/app-repo/python-app
+  pullPolicy: Never
+  tag: "0.2.0"
 
 service:
   type: ClusterIP
