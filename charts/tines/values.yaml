@@ -1,0 +1,43 @@
+global:
+  tenantName: "tenant-name"
+
+image:
+  registry: registry.tines.com
+  repository: tines/tines-app
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets:
+  - name: tines-registry-secret
+
+redis:
+  image: redis:7-alpine
+  port: 6379
+
+postgres:
+  image: postgres:15-alpine
+  port: 5432
+  auth:
+    username: tines
+    password: password
+    database: tines_production
+
+sidekiq:
+  replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 3000
+
+ingress:
+  enabled: false
+  hosts:
+    - host: tines.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+
+env:
+  secretKeyBase: "please-change-me-to-a-secure-random-string"
+  encryptionKey: "please-change-me-to-a-secure-random-string"

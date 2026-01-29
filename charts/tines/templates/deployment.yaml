@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tines.fullname" . }}-app
+  labels:
+    {{- include "tines.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      {{- include "tines.selectorLabels" . | nindent 6 }}
+      component: app
+  template:
+    metadata:
+      labels:
+        {{- include "tines.selectorLabels" . | nindent 8 }}
+        component: app
+    spec:
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          env:
+            - name: DATABASE_URL
+              value: "postgres://{{ .Values.postgres.auth.username }}:{{ .Values.postgres.auth.password }}@{{ include "tines.fullname" . }}-postgres:{{ .Values.postgres.port }}/{{ .Values.postgres.auth.database }}"
+            - name: REDIS_URL
+              value: "redis://{{ include "tines.fullname" . }}-redis:{{ .Values.redis.port }}/0"
+            - name: SECRET_KEY_BASE
+              value: {{ .Values.env.secretKeyBase | quote }}
+            - name: TENANT_NAME
+              value: {{ .Values.global.tenantName | quote }}
+          # Liveness and readiness probes would go here
