@@ -7,6 +7,7 @@ app = FastAPI()
 def read_root():
     return {
         "Hello": "World",
+        "version": "0.4.0",
         "timestamp": datetime.now().isoformat()
     }
 

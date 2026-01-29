@@ -1,6 +1,6 @@
 CLUSTER_NAME := services
 IMAGE_NAME := localhost/app-repo/python-app
-TAG := 0.3.0
+TAG := 0.4.0
 
 .PHONY: cluster build deploy-local destroy bootstrap stop start port-forward-app port-forward-argocd
 
