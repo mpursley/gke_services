@@ -20,6 +20,7 @@ This project implements a complete, modern CI/CD pipeline for deploying Python a
 *   **CI (Build/Test):** GitHub Actions
 *   **Packaging:** Helm Charts
 *   **CD (GitOps):** ArgoCD
+<img width="2233" height="1719" alt="Screenshot From 2026-01-28 23-00-35" src="https://github.com/user-attachments/assets/2c2ffd96-1d96-4169-b44c-4464a90448e5" />
 
 ### Cluster Services ("The Plumbing")
 *   **Ingress:** NGINX Ingress Controller
