@@ -1,5 +1,5 @@
 global:
-  tenantName: "tenant-name"
+  tenantName: "autumn-sunset-1759"
 
 image:
   registry: registry.tines.com
@@ -39,5 +39,6 @@ ingress:
           pathType: ImplementationSpecific
 
 env:
-  secretKeyBase: "please-change-me-to-a-secure-random-string"
-  encryptionKey: "please-change-me-to-a-secure-random-string"
+  # Keys managed via Secret
+  secretKeyBase: ""
+  encryptionKey: ""
