@@ -2,7 +2,7 @@ CLUSTER_NAME := services
 IMAGE_NAME := localhost/app-repo/python-app
 TAG := latest
 
-.PHONY: cluster build deploy-local destroy bootstrap
+.PHONY: cluster build deploy-local destroy bootstrap stop start port-forward-app port-forward-argocd
 
 cluster:
 	kind create cluster --name $(CLUSTER_NAME) --config kind-config.yaml
@@ -28,3 +28,14 @@ bootstrap:
 destroy:
 	kind delete cluster --name $(CLUSTER_NAME)
 
+stop:
+	docker stop $(CLUSTER_NAME)-control-plane
+
+start:
+	docker start $(CLUSTER_NAME)-control-plane
+
+port-forward-app:
+	kubectl port-forward svc/python-app 8080:80
+
+port-forward-argocd:
+	kubectl port-forward -n argocd svc/argocd-server 8081:443
