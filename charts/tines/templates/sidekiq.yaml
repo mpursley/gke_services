@@ -30,7 +30,7 @@ spec:
               value: "redis://{{ include "tines.fullname" . }}-redis:{{ .Values.redis.port }}/0"
             - name: RAILS_ENV
               value: "production"
-            - name: SECRET_KEY_BASE
+            - name: APP_SECRET_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: tines-app-config

@@ -34,7 +34,7 @@ spec:
               value: "postgres://{{ .Values.postgres.auth.username }}:{{ .Values.postgres.auth.password }}@{{ include "tines.fullname" . }}-postgres:{{ .Values.postgres.port }}/{{ .Values.postgres.auth.database }}"
             - name: REDIS_URL
               value: "redis://{{ include "tines.fullname" . }}-redis:{{ .Values.redis.port }}/0"
-            - name: SECRET_KEY_BASE
+            - name: APP_SECRET_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: tines-app-config
