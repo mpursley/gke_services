@@ -46,4 +46,6 @@ spec:
                   key: TINES_ENCRYPTION_KEY
             - name: TENANT_NAME
               value: {{ .Values.global.tenantName | quote }}
+            - name: DOMAIN
+              value: "localhost:3000"
           # Liveness and readiness probes would go here
