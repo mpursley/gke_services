@@ -1,0 +1,385 @@
+https://www.tines.com/docs/self-hosting/docker-compose/custom-deployment/
+
+Architecture overview 
+​Basic architecture​ 
+Tines is a Rails application that uses a PostgreSQL database for its persistent data storage and Redis for its cached data storage and message queuing.
+
+It features two core application containers: tines-app and tines-sidekiq. tines-app runs the Rails server for web application hosting/receiving webhooks. tines-sidekiq runs background worker processes. Both containers read and write to and from the PostgreSQL database and Redis cache - they don't communicate directly, instead, they swap data and messages through PostgreSQL/Redis.
+
+Both the tines-app and tines-sidekiq containers use the same tines-app Docker image with different entry points (start-tines-app and start-tines-sidekiq respectively).
+
+The tines-app and tines-sidekiq containers both make requests to external services to run your automation stories.
+
+The tines-sidekiq container may be optionally configured to periodically load new Action templates from Tines (at integrations.tines.com) and to send basic version and feature usage information back to Tines (at hq.tines.io).
+
+A tines-nginx container is usually deployed in front of the tines-app container to terminate SSL. Alternatively, any load balancer, load balancer service, or reverse proxy can fill this role.
+
+Serving the web application​ 
+A user's browser connects via HTTPS to the Tines web application via the tines-nginx container or an LB/reverse proxy, which terminates the SSL connection and connects to the tines-app container over HTTP.
+
+Running Actions on tines-sidekiq​ 
+The Tines product features 7 different types of automation "Actions", 3 of which cause Tines to connect to external services: IMAP, Email (SMTP), HTTP Request.
+
+When a user "runs" an Action via the web application, a task is enqueued in the Redis cluster by the tines-app container. The tines-sidekiq container reads from this queue, reads related data from the PostgresSQL database and performs the Action, which may result in a HTTP, SMTP or IMAP request to an external server.
+
+The data gathered from these requests is stored in an "event" in the PostgresSQL database.
+
+Actions can also run as a result of an upstream Action running successfully, or on a schedule. When this happens, a task is enqueued in the Redis cluster by the tines-sidekiq container for each Action that will run.
+
+Testing Actions on tines-app​ 
+When "test" mode is invoked via the web application, the tines-app container directly executes the Action (rather than enqueuing it via the Redis instance for later execution by the tines-sidekiq container).
+
+When this happens, the tines-app container may itself make a HTTP, SMTP or IMAP request to an external server.
+
+Receiving webhooks​ 
+An external service may post webhooks to the tines-app container through the same tines-nginx container or LB/reverse proxy used to host the web application.
+
+When a webhook is received, the data is stored in an event in the PostgresSQL database. Further downstream Actions may be executed in turn by the tines-app container enqueuing tasks in the Redis cluster.
+___
+Prerequisites for deploying Tines on Docker Compose
+​Preparation for Onboarding Meeting 
+To prepare for a standard Tines self-hosted deployment, you need to complete the following tasks before your first onboarding meeting:
+
+Complete and submit the Self-Hosted questionnaire 
+
+Gather information for the configuration of the .env configuration file
+
+At the installation stage, you will be required to configure your .env file.
+
+Tip: Before installation, use this .env File Configuration Information Sheet to record this configuration information
+
+💡
+Note
+For custom configuration and deployment, contact your Tines Sales Engineer (SE) or Customer Success Engineer (CSE).
+
+Deployment Requirements 
+Provision a Linux host machine with the following minimum specifications: 8 GB RAM, 60 GB HDD, 2 CPUs.  For an AWS EC2 host machine, Tines recommends an m7i.large or m7a.large instance and a minimum disk space of 50GB.
+
+Ensure that your host machine has access to the internet.
+
+Open firewall inbound port 443 for HTTPs.
+
+Install Docker and Docker Compose on your host machine.
+
+Install netcat on your host machine.
+
+Set up an SMTP Server for your Tines tenant.
+
+Generate SSL/TLS certificate files and name the files tines.crt and tines.key.
+
+To request the download installation package, open a Support ticket via support@tines.com.
+
+Provision a Linux host machine for Tines Tunnel (if applicable).
+
+.env File Configuration Information Sheet 
+At the installation stage, you will be required to configure your .env file. 
+
+Prior to installation, use this Information Sheet to collect the following information for the .env file:
+
+Tenant name: 
+
+Telemetry ID:
+
+Seed email:
+
+Seed first name:
+
+Seed last name:
+
+Domain:
+
+Port:
+
+SMTP domain:
+
+SMTP user name:
+
+SMTP password:
+
+SMTP server:
+
+SMTP port:
+
+Email From address:
+🪄
+Tip
+If you do not need an SMTP configuration, the option needs to be commented out by adding #. If you leave these fields blank the installation will fail as it interprets this as a null value.
+___
+Deploying Tines on Docker Compose
+Step 1. Install Netcat 
+To install netcat, run the following:
+
+AWS Linux or RedHat/CentOS:
+
+sudo yum install nc
+Ubuntu or Debian:
+
+sudo apt-get install nc
+Step 2. Install Docker 
+To install docker, run the following:
+
+AWS Linux or RedHat/CentOS:
+
+sudo yum install docker
+Ubuntu or Debian:
+
+sudo apt-get install docker
+💡
+Note
+By default, Docker doesn't perform any log rotation. As a result, a significant amount of disk space can be used by logs generated by the Tines containers.
+
+To switch to Docker's recommended logging driver, which rotates log files by default, we suggest setting the following value in /etc/docker/daemon.json, before restarting the Docker process (e.g. via systemctl reload docker):
+
+{
+  "log-driver": "local"
+}
+See https://docs.docker.com/config/containers/logging/configure/ for more background and information about other logging drivers.
+
+Step 3. Install docker-compose 
+To install docker-compose, run the following:
+
+# Replace {version} with the version of docker-compose you want to download
+curl -L "https://github.com/docker/compose/releases/download/{version}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+chmod +x /usr/local/bin/docker-compose
+
+ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+Step 4. Create Installation Directory​  
+Create a directory for the Tines installation, for example, /opt/tines:
+
+sudo mkdir /opt/tines
+Step 5. Create tines.crt and tines.key Files 
+To create the tines.crt and tines.key files, run the following command within your installation directory:
+
+sudo openssl req -x509 -out /opt/tines/tines.crt -keyout /opt/tines/tines.key -newkey rsa:2048 -nodes -sha256
+Example 
+[ec2-user@ip-172-31-13-57 tines]$ sudo openssl req -x509 -out /opt/tines/tines.crt -keyout /opt/tines/tines.key -newkey rsa:2048 -nodes -sha256
+
+Generating a 2048-bit RSA private key
+
+..........................................+++
+
+.....................................+++
+
+writing new private key to '/opt/tines/tines.key'
+
+-----
+
+You are about to be asked to enter information that will be incorporated
+
+into your certificate request.
+
+What you are about to enter is what is called a Distinguished Name or a DN.
+
+There are quite a few fields but you can leave some blank.
+
+For some fields, there will be a default value,
+
+If you enter '.', the field will be left blank.
+
+-----
+
+Country Name (2 letter code) [XX]:US
+
+State or Province Name (full name) []:Massachusetts
+
+Locality Name (eg, city) [Default City]:Boston
+
+Organization Name (eg, company) [Default Company Ltd]:Tines
+
+Organizational Unit Name (eg, section) []:Support
+
+Common Name (eg, your name or your server's hostname) []:ec2-44-192-9-108.compute-1.amazonaws.com
+
+Email Address []:yourname@yourcompany.com
+
+[ec2-user@ip-172-31-13-57 tines]$ ls
+
+commands.sh  docker-compose.yml  docs  postgres.tar  redis.tar  setup.sh  tines-app.tar  tines.crt  tines.key  tines-nginx.tar  upgrade.sh
+
+[ec2-user@ip-172-31-13-57 tines]$ 
+Step 6. Generate Secret Token 
+To generate the app secret token, run the following command on your Linux host:
+
+openssl rand -hex 64
+Step 7. Get Access to the Installation Package​  
+To access the installation package, follow these steps:
+
+Send an email to support@tines.io and request that your cloud tenant be enabled to allow the download of the self-hosted installation package.
+
+Once Tines Support has enabled the self-hosted installation package download, visit the /settings/upgrade page on your cloud tenant to copy the URL to the installation package. This URL will remain valid for 3 minutes. The file will be a zip archive named as follows: tines_<build id>.zip. The installation package contains the following files:
+
+Tines Self-Hosted Installation Package Files 
+
+Filename and Description
+
+docker-compose.yml
+
+Configuration file for Docker Compose
+
+.env.tmpl
+
+Tines environment setting. Needs to be edited.
+
+postgres.tar
+
+Postgres docker image
+
+redis.tar
+
+Redis Docker image
+
+tines-app.tar
+
+Tines application Docker image
+
+tines-nginx.tar
+
+Tines nginx docker image
+
+upgrade.sh
+
+Script to upgrade between Tines versions
+
+setup.sh
+
+Script to install Tines
+
+Step 8. Download the Tines Application .zip File  
+Use the URL that generated in the previous step to download the Tines application .zip file to your Linux host as shown below. Please retain the quotations around the URL as there are some special characters.
+
+ec2-user@ip-172-31-13-57 ~]$ sudo curl "https://tines-releases.s3.eu-west-1.amazonaws.com/tines_6a504e44_v31_4_0.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA4AR6WFWBAAGLKFVE%2F20250616%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20250616T092200Z&X-Amz-Expires=180&X-Amz-SignedHeaders=host&X-Amz-Signature=aa2667feb2f23938e448ec4a0ff524f7f0ded8817867e7c5be29b1d37a6dedd5" --output /tmp/tines_6a504e44_v31_4_0.zip /tmp/
+If you cannot download files remotely to your Linux host, you can use scp with your private key, as shown below:
+
+C:\Users\Ben\Downloads>scp -i BenTest.pem tines_6a504e44_v31_4_0.zip ec2-user@ec2-44-192-9-108.compute-1.amazonaws.com:tines_6a504e44_v31_4_0.zip
+
+The authenticity of host 'ec2-44-192-9-108.compute-1.amazonaws.com (44.192.9.108)' can't be established.
+
+ECDSA key fingerprint is SHA256:4uSIhoRWK9PemgpfLh8l/gY0Ng/XFlr4t0x/aK4sSkY.
+
+Are you sure you want to continue connecting (yes/no/[fingerprint])?
+
+Please type 'yes', 'no' or the fingerprint:
+
+Warning: Permanently added 'ec2-44-192-9-108.compute-1.amazonaws.com,44.192.9.108' (ECDSA) to the list of known hosts.
+
+tines_6a504e44_v31_4_0.zip                                                            100%  368MB 2.9MB/s 02:08
+Step 9. Move Files to Installation Directory​  
+Unzip the installation package and move all files to the installation directory:
+
+unzip tines_<build_id>.zip
+
+cp -rT tines_<build_id>/ /opt/tines
+If you encounter an error like the following, then you need to re-visit the /settings/upgrade page on your tenant and regenerate the download URL. Please ensure that you begin your download within 3 minutes.
+
+Archive:  /tmp/tines_6a504e44_v31_4_0.zip
+  End-of-central-directory signature not found.  Either this file is not
+  a zipfile, or it constitutes one disk of a multi-part archive.  In the
+  latter case the central directory and zipfile comment will be found on
+  the last disk(s) of this archive.
+unzip:  cannot find zipfile directory in one of /tmp/tines_6a504e44_v31_4_0.zip or
+        /tmp/tines_6a504e44_v31_4_0.zip.zip, and cannot find /tmp/tines_6a504e44_v31_4_0.zip.ZIP, period.
+Step 10. Create a .env file using.env.tmpl  
+The .env file contains Tines environment variables and is used to configure the Tines instance. 
+
+To edit the .env.tmpl file (you can also find it at ENV configuration), follow these steps: 
+
+Open the .env.tmpl file using a text editor. 
+
+Using the information that you recorded in the “.env File Configuration Information Sheet” step, update the following two sections of the .env.tmpl file to reflect your environment: Tenant Configuration and Email Configuration.
+
+Tenant Configuration: Enter basic information about the tenant, including its name, seed user details (the first user account that will be created) and domain (the FQDN).
+
+Email Configuration: Enter SMTP server details. Tines will use these when sending emails.
+
+3. After updating the file, save it as .env.
+
+Step 11. Run Setup Script​  
+Your installation directory should now contain the following files:
+
+docker-compose.yml
+
+.env (updated and renamed)
+
+postgres.tar
+
+redis.tar
+
+tines-app.tar
+
+tines-nginx.tar
+
+tines.crt
+
+tines.key
+
+upgrade.sh
+
+setup.sh
+
+Use the following command to run the Tines setup script:
+
+bash setup.sh
+Upon completion of the installation and the startup of the services and containers, a verification email will be sent to the email address that you specified in the SEED_EMAIL entry of the .env file. To verify the installation and to launch the Tines dashboard, click on the link provided in the email.
+___
+Upgrading Tines on Docker Compose
+❗️
+Important
+To ensure a smooth upgrade experience and maintain compatibility, we recommend customers follow these sequential upgrade paths:
+
+For example From version 18.x to 20.x:
+Upgrade first from 18.x to 19.x.
+After successfully upgrading to 19.x, proceed to upgrade from 19.x to 20.x.
+
+Pre-upgrade recommendations 
+Before upgrading, we advise that you backup your data following the recommendations here.
+
+Step 1. Downloading upgrade package  
+You will need to have an active Cloud tenant to access the latest self-hosted version of Tines. Download the Tines installation package using the following link:
+
+https://<your cloud tenant name>.tines.com/admin/upgrade
+
+For example
+
+https://quiet-sky-3834.tines.com/admin/upgrade
+
+The file will be a zip archive named as follows: tines_<build id>.zip. 
+
+Unzip the archive and upload it to the host machine where Tines is installed. 
+
+Step 2. Move files to the installation directory  
+Unzip the installation package and move all the files to the tines installation directory: 
+
+unzip tines_<build_id>.zip 
+
+cp -rT tines_<build_id>/ /opt/tines  
+Step 3. Running upgrade script  
+The installation package includes an upgrade script, upgrade.sh. Ensure it is executable with the following command: 
+
+chmod +x upgrade.sh
+Run the upgrade script: 
+
+./upgrade.sh 
+When the upgrade script runs it will attempt to back up the database. To do this, it will print a list of volumes where the database data may be stored. When prompted, type the correct volume (under default conditions there will only be one). 
+
+ 
+
+Troubleshooting  
+If Tines did not start after running ​docker-compose up​, check the console for relevant errors. You can also use steps in our Troubleshooting Tines on Docker Compose to diagnose the issue.
+
+Contact ​support@tines.io​ with the output of ​upgrade.sh script and docker-compose logs​.
+
+Upgrading Redis 
+Tines 14.0 and above requires Redis 6.2 or above, Tines 31.2 recommends using Redis 7.0. If you were previously running Tines 13.x or below then you'll need to change the version of the Redis Docker image used in your installation. This can be done at any stage before upgrading to 14.x or above - Redis 6.2 is compatible with all previous Tines versions.
+
+To do this you need to:
+
+Open a terminal in your installation directory (typically /opt/tines).
+
+Run docker-compose stop to stop your installation's Docker containers. This will completely stop your installation until you restart the containers later, so be aware that this will cause downtime.
+
+Open the docker-compose.yml file in your installation directory.
+
+Edit the image key under the redis service in that file to use the image you require, redis:x.x-alpine.
+
+Save your changes to the docker-compose.yml file and run docker-compose up -d - this will restart your installation with the new Redis image.
