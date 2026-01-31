@@ -39,3 +39,6 @@ port-forward-app:
 
 port-forward-argocd:
 	kubectl port-forward -n argocd svc/argocd-server 8081:443
+
+port-forward-tines:
+	kubectl port-forward -n tines svc/tines-app 3000:80

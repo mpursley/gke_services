@@ -1,0 +1,51 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tines-migration-manual
+  labels:
+    app.kubernetes.io/name: tines
+    app.kubernetes.io/instance: tines
+    component: migration
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tines
+        app.kubernetes.io/instance: tines
+        component: migration
+    spec:
+      restartPolicy: OnFailure
+      imagePullSecrets:
+        - name: tines-registry-secret
+      containers:
+        - name: tines-migration
+          image: "registry.tines.com/tines/tines-app:latest"
+          imagePullPolicy: IfNotPresent
+          command: ["bundle", "exec", "rails", "db:prepare"]
+          env:
+            - name: RAILS_ENV
+              value: "production"
+            - name: DATABASE_URL
+              value: "postgres://tines:password@tines-postgres:5432/tines_production"
+            - name: REDIS_URL
+              value: "redis://tines-redis:6379/0"
+            - name: APP_SECRET_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: tines-app-config
+                  key: SECRET_KEY_BASE
+            - name: TINES_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tines-app-config
+                  key: TINES_ENCRYPTION_KEY
+            - name: TENANT_NAME
+              value: "autumn-sunset-1759"
+            - name: DOMAIN
+              value: "localhost:3000"
+            - name: SEED_EMAIL
+              value: "admin@example.com"
+            - name: SEED_FIRST_NAME
+              value: "Admin"
+            - name: SEED_LAST_NAME
+              value: "User"
