@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/name: redis
     app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.redis.replicaCount | default 1 }}
   selector:
     matchLabels:
       app.kubernetes.io/name: redis

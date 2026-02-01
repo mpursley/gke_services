@@ -1,6 +1,11 @@
 global:
   tenantName: "autumn-sunset-1759"
 
+replicaCount: 0
+
+migration:
+  enabled: false
+
 image:
   registry: registry.tines.com
   repository: tines/tines-app
@@ -13,6 +18,7 @@ imagePullSecrets:
 redis:
   image: redis:7-alpine
   port: 6379
+  replicaCount: 0
 
 postgres:
   image: postgres:15-alpine
@@ -21,9 +27,10 @@ postgres:
     username: tines
     password: password
     database: tines_production
+  replicaCount: 0
 
 sidekiq:
-  replicaCount: 1
+  replicaCount: 0
 
 service:
   type: ClusterIP

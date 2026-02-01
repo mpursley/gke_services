@@ -1,3 +1,4 @@
+{{- if .Values.migration.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -44,3 +45,4 @@ spec:
               value: {{ .Values.global.tenantName | quote }}
             - name: DOMAIN
               value: "localhost:3000"
+{{- end }}
