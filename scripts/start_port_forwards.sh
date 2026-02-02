@@ -18,15 +18,36 @@ kubectl port-forward -n tines svc/tines-app 3000:80 > /dev/null 2>&1 &
 TINES_PID=$!
 echo "tines-app port-forward started with PID $TINES_PID"
 
+# Start port-forwarding for Grafana
+echo "Starting port-forward for Grafana on port 3001..."
+kubectl port-forward -n monitoring svc/kube-prometheus-stack-grafana 3001:80 > /dev/null 2>&1 &
+GRAFANA_PID=$!
+echo "Grafana port-forward started with PID $GRAFANA_PID"
+
+# Start port-forwarding for Prometheus
+echo "Starting port-forward for Prometheus on port 9090..."
+kubectl port-forward -n monitoring svc/kube-prometheus-stack-prometheus 9090:9090 > /dev/null 2>&1 &
+PROMETHEUS_PID=$!
+echo "Prometheus port-forward started with PID $PROMETHEUS_PID"
+
+# Start port-forwarding for Alertmanager
+echo "Starting port-forward for Alertmanager on port 9093..."
+kubectl port-forward -n monitoring svc/kube-prometheus-stack-alertmanager 9093:9093 > /dev/null 2>&1 &
+ALERTMANAGER_PID=$!
+echo "Alertmanager port-forward started with PID $ALERTMANAGER_PID"
+
 echo "Port forwarding setup complete."
 echo "-------------------------------------------------------"
 echo "Access the services at the following URLs:"
 echo "Python App:   http://localhost:8080"
 echo "ArgoCD:       https://localhost:8081"
 echo "Tines:        http://localhost:3000"
+echo "Grafana:      http://localhost:3001"
+echo "Prometheus:   http://localhost:9090"
+echo "Alertmanager: http://localhost:9093"
 echo "-------------------------------------------------------"
 echo "Press Ctrl+C to stop all port-forwards."
 
 # Wait for user interrupt
-trap "kill $APP_PID $ARGO_PID $TINES_PID; exit" INT
+trap "kill $APP_PID $ARGO_PID $TINES_PID $GRAFANA_PID $PROMETHEUS_PID $ALERTMANAGER_PID; exit" INT
 wait
