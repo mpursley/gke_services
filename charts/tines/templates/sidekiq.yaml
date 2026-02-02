@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "tines.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.sidekiq.replicaCount | default 1 }}
+  replicas: {{ if not (kindIs "invalid" .Values.sidekiq.replicaCount) }}{{ .Values.sidekiq.replicaCount }}{{ else }}1{{ end }}
   selector:
     matchLabels:
       {{- include "tines.selectorLabels" . | nindent 6 }}
