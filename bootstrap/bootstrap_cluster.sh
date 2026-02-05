@@ -30,5 +30,8 @@ echo "Installing ArgoCD..."
 helm upgrade --install argocd argocd/argo-cd \
   --namespace argocd --create-namespace
 
+echo "Applying ArgoCD Applications..."
+kubectl apply -f argocd/applications/
+
 echo "Bootstrap complete!"
 

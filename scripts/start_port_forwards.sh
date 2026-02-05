@@ -7,20 +7,20 @@ APP_PID=$!
 echo "python-app port-forward started with PID $APP_PID"
 
 # Start port-forwarding for ArgoCD
-echo "Starting port-forward for argocd-server on port 8081..."
-kubectl port-forward -n argocd svc/argocd-server 8081:443 > /dev/null 2>&1 &
+echo "Starting port-forward for argocd-server on port 3001..."
+kubectl port-forward -n argocd svc/argocd-server 3001:443 > /dev/null 2>&1 &
 ARGO_PID=$!
 echo "argocd-server port-forward started with PID $ARGO_PID"
 
 # Start port-forwarding for Tines
-echo "Starting port-forward for tines-app on port 3000..."
-kubectl port-forward -n tines svc/tines-app 3000:80 > /dev/null 2>&1 &
+echo "Starting port-forward for tines-app on port 3002..."
+kubectl port-forward -n tines svc/tines-app 3002:80 > /dev/null 2>&1 &
 TINES_PID=$!
 echo "tines-app port-forward started with PID $TINES_PID"
 
 # Start port-forwarding for Grafana
-echo "Starting port-forward for Grafana on port 3001..."
-kubectl port-forward -n monitoring svc/kube-prometheus-stack-grafana 3001:80 > /dev/null 2>&1 &
+echo "Starting port-forward for Grafana on port 3000..."
+kubectl port-forward -n monitoring svc/kube-prometheus-stack-grafana 3000:80 > /dev/null 2>&1 &
 GRAFANA_PID=$!
 echo "Grafana port-forward started with PID $GRAFANA_PID"
 
@@ -40,9 +40,9 @@ echo "Port forwarding setup complete."
 echo "-------------------------------------------------------"
 echo "Access the services at the following URLs:"
 echo "Python App:   http://localhost:8080"
-echo "ArgoCD:       https://localhost:8081"
-echo "Tines:        http://localhost:3000"
-echo "Grafana:      http://localhost:3001"
+echo "Grafana:      http://localhost:3000"
+echo "ArgoCD:       https://localhost:3001"
+echo "Tines:        http://localhost:3002"
 echo "Prometheus:   http://localhost:9090"
 echo "Alertmanager: http://localhost:9093"
 echo "-------------------------------------------------------"
