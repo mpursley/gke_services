@@ -7,6 +7,7 @@ helm repo add jetstack https://charts.jetstack.io
 helm repo add external-secrets https://charts.external-secrets.io
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo add argocd https://argoproj.github.io/argo-helm
+helm repo add grafana https://grafana.github.io/helm-charts
 helm repo update
 
 echo "Installing Ingress NGINX..."
@@ -25,6 +26,13 @@ helm upgrade --install external-secrets external-secrets/external-secrets \
 echo "Installing Prometheus Stack (Monitoring)..."
 helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
   --namespace monitoring --create-namespace
+
+echo "Installing Loki (Logging)..."
+helm upgrade --install loki grafana/loki-stack \
+  --namespace monitoring \
+  --set loki.persistence.enabled=true,loki.persistence.size=5Gi \
+  --set loki.image.tag=2.9.10 \
+  --set loki.config.limits_config.volume_enabled=true
 
 echo "Installing ArgoCD..."
 helm upgrade --install argocd argocd/argo-cd \

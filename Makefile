@@ -29,10 +29,12 @@ destroy:
 	kind delete cluster --name $(CLUSTER_NAME)
 
 stop:
-	docker stop $(CLUSTER_NAME)-control-plane
+	podman stop $(CLUSTER_NAME)-control-plane
+	podman machine stop
 
 start:
-	docker start $(CLUSTER_NAME)-control-plane
+	podman machine start
+	podman start $(CLUSTER_NAME)-control-plane
 
 port-forward-app:
 	kubectl port-forward svc/python-app 8080:80
