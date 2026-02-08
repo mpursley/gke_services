@@ -32,7 +32,8 @@ helm upgrade --install loki grafana/loki-stack \
   --namespace monitoring \
   --set loki.persistence.enabled=true,loki.persistence.size=5Gi \
   --set loki.image.tag=2.9.10 \
-  --set loki.config.limits_config.volume_enabled=true
+  --set loki.config.limits_config.volume_enabled=true \
+  --set loki.isDefault=false
 
 echo "Installing ArgoCD..."
 helm upgrade --install argocd argocd/argo-cd \

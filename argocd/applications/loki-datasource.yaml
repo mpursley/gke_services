@@ -6,10 +6,10 @@ metadata:
   labels:
     grafana_datasource: "1"
 data:
-  datasource.yaml: |-
+  loki-datasource-extra.yaml: |-
     apiVersion: 1
     datasources:
-    - name: Loki
+    - name: Loki-Extra
       type: loki
       access: proxy
       url: http://loki.monitoring.svc.cluster.local:3100
