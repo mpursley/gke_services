@@ -33,8 +33,11 @@ stop:
 	podman machine stop
 
 start:
-	podman machine start
+	-podman machine start
 	podman start $(CLUSTER_NAME)-control-plane
+	@echo "Waiting for cluster to be ready..."
+	@sleep 5
+	./scripts/start_port_forwards.sh
 
 port-forward-app:
 	kubectl port-forward svc/python-app 8080:80

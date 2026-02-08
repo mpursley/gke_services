@@ -12,12 +12,6 @@ kubectl port-forward -n argocd svc/argocd-server 3001:443 > /dev/null 2>&1 &
 ARGO_PID=$!
 echo "argocd-server port-forward started with PID $ARGO_PID"
 
-# Start port-forwarding for Tines
-echo "Starting port-forward for tines-app on port 3002..."
-kubectl port-forward -n tines svc/tines-app 3002:80 > /dev/null 2>&1 &
-TINES_PID=$!
-echo "tines-app port-forward started with PID $TINES_PID"
-
 # Start port-forwarding for Grafana
 echo "Starting port-forward for Grafana on port 3000..."
 kubectl port-forward -n monitoring svc/kube-prometheus-stack-grafana 3000:80 > /dev/null 2>&1 &
@@ -42,12 +36,11 @@ echo "Access the services at the following URLs:"
 echo "Python App:   http://localhost:8080"
 echo "Grafana:      http://localhost:3000"
 echo "ArgoCD:       https://localhost:3001"
-echo "Tines:        http://localhost:3002"
 echo "Prometheus:   http://localhost:9090"
 echo "Alertmanager: http://localhost:9093"
 echo "-------------------------------------------------------"
 echo "Press Ctrl+C to stop all port-forwards."
 
 # Wait for user interrupt
-trap "kill $APP_PID $ARGO_PID $TINES_PID $GRAFANA_PID $PROMETHEUS_PID $ALERTMANAGER_PID; exit" INT
+trap "kill $APP_PID $ARGO_PID $GRAFANA_PID $PROMETHEUS_PID $ALERTMANAGER_PID; exit" INT
 wait
