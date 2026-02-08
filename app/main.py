@@ -7,7 +7,7 @@ app = FastAPI()
 @app.get("/", response_class=HTMLResponse)
 def read_root():
     links = {
-        "Python App": "http://localhost:8080",
+        "Services Landing Page": "http://localhost:8080",
         "Grafana": "http://localhost:3000",
         "ArgoCD": "https://localhost:3001",
         "Prometheus": "http://localhost:9090",
@@ -32,7 +32,7 @@ def read_root():
         </head>
         <body>
             <h1>GKE Services Dashboard</h1>
-            <p>Version: 0.4.0</p>
+            <p>Version: 0.5.0</p>
             <ul>
                 {links_html}
             </ul>

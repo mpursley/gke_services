@@ -82,7 +82,7 @@ terraform apply -var="project_id=YOUR_PROJECT_ID"
 
 ### 2. CI/CD Setup
 *   Update `.github/workflows/ci.yaml` with your GCP Workload Identity Provider and Service Account details.
-*   Point the ArgoCD Application manifest in `argocd/applications/python-app.yaml` to your fork/repository.
+*   Point the ArgoCD Application manifest in `argocd/applications/services-landing-page-app.yaml` to your fork/repository.
 
 ---
 
