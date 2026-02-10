@@ -19,7 +19,7 @@ GRAFANA_PID=$!
 echo "Grafana port-forward started with PID $GRAFANA_PID"
 
 # Start port-forwarding for Prometheus
-echo "Starting port-forward for Prometheus on port 9090..."
+echo "Starting port-forward for Prometheus on port 9091..."
 kubectl port-forward -n monitoring svc/kube-prometheus-stack-prometheus 9091:9090 > /dev/null 2>&1 &
 PROMETHEUS_PID=$!
 echo "Prometheus port-forward started with PID $PROMETHEUS_PID"
@@ -36,7 +36,7 @@ echo "Access the services at the following URLs:"
 echo "Services Landing Page:   http://localhost:8080"
 echo "Grafana:      http://localhost:3000"
 echo "ArgoCD:       https://localhost:3001"
-echo "Prometheus:   http://localhost:9090"
+echo "Prometheus:   http://localhost:9091"
 echo "Alertmanager: http://localhost:9093"
 echo "-------------------------------------------------------"
 echo "Press Ctrl+C to stop all port-forwards."
