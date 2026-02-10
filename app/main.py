@@ -10,7 +10,7 @@ def read_root():
         "Services Landing Page": "http://localhost:8080",
         "Grafana": "http://localhost:3000",
         "ArgoCD": "https://localhost:3001",
-        "Prometheus": "http://localhost:9090",
+        "Prometheus": "http://localhost:9091",
         "Alertmanager": "http://localhost:9093"
     }
     
