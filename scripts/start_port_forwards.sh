@@ -20,7 +20,7 @@ echo "Grafana port-forward started with PID $GRAFANA_PID"
 
 # Start port-forwarding for Prometheus
 echo "Starting port-forward for Prometheus on port 9090..."
-kubectl port-forward -n monitoring svc/kube-prometheus-stack-prometheus 9090:9090 > /dev/null 2>&1 &
+kubectl port-forward -n monitoring svc/kube-prometheus-stack-prometheus 9091:9090 > /dev/null 2>&1 &
 PROMETHEUS_PID=$!
 echo "Prometheus port-forward started with PID $PROMETHEUS_PID"
 
