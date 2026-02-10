@@ -1,3 +1,5 @@
+export KIND_EXPERIMENTAL_PROVIDER=podman
+
 CLUSTER_NAME := services
 IMAGE_NAME := localhost/app-repo/services-landing-page-app
 TAG := 0.5.0
@@ -13,7 +15,7 @@ build:
 deploy-local: build
 	# Load image from podman to kind
 	podman save $(IMAGE_NAME):$(TAG) -o image.tar
-	kind load image-archive image.tar --name $(CLUSTER_NAME)
+	KIND_EXPERIMENTAL_PROVIDER=podman kind load image-archive image.tar --name $(CLUSTER_NAME)
 	rm image.tar
 	# Install Chart
 	helm upgrade --install services-landing-page-app ./charts/services-landing-page-app \
