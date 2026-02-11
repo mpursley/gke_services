@@ -7,7 +7,7 @@ app = FastAPI()
 @app.get("/", response_class=HTMLResponse)
 def read_root():
     links = {
-        "Services Landing Page": "http://localhost:8080",
+        "Services Landing Page": "http://localhost:8090",
         "Grafana": "http://localhost:3000",
         "ArgoCD": "https://localhost:3001",
         "Prometheus": "http://localhost:9091",

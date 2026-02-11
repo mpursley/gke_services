@@ -42,7 +42,7 @@ start:
 	./scripts/start_port_forwards.sh
 
 port-forward-app:
-	kubectl port-forward svc/services-landing-page-app 8080:80
+	kubectl port-forward svc/services-landing-page-app 8090:80
 
 port-forward-argocd:
 	kubectl port-forward -n argocd svc/argocd-server 8081:443
