@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Start port-forwarding for the services landing page application
-echo "Starting port-forward for services-landing-page-app on port 8080..."
-kubectl port-forward svc/services-landing-page-app 8080:80 > /dev/null 2>&1 &
+echo "Starting port-forward for services-landing-page-app on port 8090..."
+kubectl port-forward svc/services-landing-page-app 8090:80 > /dev/null 2>&1 &
 APP_PID=$!
 echo "services-landing-page-app port-forward started with PID $APP_PID"
 
@@ -33,7 +33,7 @@ echo "Alertmanager port-forward started with PID $ALERTMANAGER_PID"
 echo "Port forwarding setup complete."
 echo "-------------------------------------------------------"
 echo "Access the services at the following URLs:"
-echo "Services Landing Page:   http://localhost:8080"
+echo "Services Landing Page:   http://localhost:8090"
 echo "Grafana:      http://localhost:3000"
 echo "ArgoCD:       https://localhost:3001"
 echo "Prometheus:   http://localhost:9091"
