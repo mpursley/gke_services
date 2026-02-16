@@ -2,7 +2,7 @@ module "vpc" {
   source       = "./modules/vpc"
   project_id   = var.project_id
   region       = var.region
-  network_name = "gke-network"
+  network_name = "k8s-network"
 }
 
 module "artifact_registry" {

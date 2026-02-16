@@ -12,5 +12,5 @@ variable "region" {
 variable "network_name" {
   description = "Name of the VPC network"
   type        = string
-  default     = "gke-network"
+  default     = "k8s-network"
 }

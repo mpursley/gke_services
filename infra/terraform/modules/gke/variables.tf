@@ -19,7 +19,7 @@ variable "subnet_name" {
 }
 
 variable "cluster_name" {
-  description = "The name of the GKE cluster"
+  description = "The name of the K8s cluster"
   type        = string
   default     = "main-cluster"
 }

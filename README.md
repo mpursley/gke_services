@@ -1,6 +1,6 @@
-# Modern GKE CI/CD Pipeline with IaC
+# Modern K8s CI/CD Pipeline with IaC
 
-This project implements a complete, modern CI/CD pipeline for deploying Python applications to Google Kubernetes Engine (GKE) using Infrastructure as Code (Terraform), GitOps (ArgoCD), and automated PR workflows (Atlantis).
+This project implements a complete, modern CI/CD pipeline for deploying Python applications to Kubernetes (K8s) using Infrastructure as Code (Terraform), GitOps (ArgoCD), and automated PR workflows (Atlantis).
 
 ## 🚀 Architecture & Tech Stack
 
@@ -8,7 +8,7 @@ This project implements a complete, modern CI/CD pipeline for deploying Python a
 *   **Source Control:** GitHub
 *   **Infrastructure as Code (IaC):** Terraform
 *   **IaC Automation:** Atlantis (Pull Request automation)
-*   **Runtime:** Google Kubernetes Engine (GKE)
+*   **Runtime:** Kubernetes (K8s)
 *   **Container Registry:** Google Artifact Registry (GAR)
 
 ### Application Stack
@@ -38,7 +38,7 @@ This project implements a complete, modern CI/CD pipeline for deploying Python a
 ├── argocd/                 # GitOps Application manifests
 ├── bootstrap/              # Cluster initialization scripts
 ├── charts/                 # Helm charts for application deployment
-├── infra/terraform/        # IaC modules (VPC, GKE, GAR)
+├── infra/terraform/        # IaC modules (VPC, K8s, GAR)
 ├── Makefile                # Local development automation
 ├── kind-config.yaml        # Local Kubernetes (Kind) configuration
 └── atlantis.yaml           # Atlantis PR automation config

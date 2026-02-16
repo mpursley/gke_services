@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/mpursley/gke_services.git
+    repoURL: https://github.com/mpursley/k8s_services.git
     targetRevision: HEAD
     path: charts/services-landing-page-app
     helm:

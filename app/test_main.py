@@ -6,8 +6,8 @@ client = TestClient(app)
 def test_read_root():
     response = client.get("/")
     assert response.status_code == 200
-    assert "GKE Services Dashboard" in response.text
-    assert "http://localhost:8090" in response.text
+    assert "K8s Services Dashboard" in response.text
+    assert "http://localhost:8080" in response.text
     assert "http://localhost:3000" in response.text
 
 def test_health():

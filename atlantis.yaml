@@ -1,6 +1,6 @@
 version: 3
 projects:
-- name: gke-platform
+- name: k8s-platform
   dir: infra/terraform
   autoplan:
     when_modified: ["*.tf", "modules/**/*.tf"]

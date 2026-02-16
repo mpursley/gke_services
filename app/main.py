@@ -19,7 +19,7 @@ def read_root():
     content = f"""
     <html>
         <head>
-            <title>Services Landing Page</title>
+            <title>K8s Services Dashboard</title>
             <style>
                 body {{ font-family: sans-serif; margin: 40px; line-height: 1.6; }}
                 h1 {{ color: #333; }}
@@ -31,7 +31,7 @@ def read_root():
             </style>
         </head>
         <body>
-            <h1>Services Landing Page</h1>
+            <h1>K8s Services Dashboard</h1>
             <p>Version: 0.5.0</p>
             <ul>
                 {links_html}
